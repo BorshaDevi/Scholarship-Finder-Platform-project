@@ -28,8 +28,27 @@ async function run() {
     await client.connect();
 
 const usersCollection=client.db('ScholarshipFinder').collection('users')
+const loginCollection=client.db('ScholarshipFinder').collection('loginUsers')
 
-
+app.post ('/loginUser',async(req ,res) =>{
+  const user=req.body
+  const email=user.email
+  const password=user.password
+  const query={email : email}
+  const findUser=await usersCollection.findOne(query)
+  const findUserPassword=bcrypt.compareSync(password , findUser.password)
+  if(!findUserPassword){
+    return res.send('Unauthorize')
+  }
+  const pass=bcrypt.hashSync(password,8)
+  const loginUser={
+    email,
+    pass
+  }
+  console.log(loginUser)
+  const result=await loginCollection.insertOne(loginUser)
+  res.send(result)
+})
 app.post('/users',async(req,res) =>{
   const user=req.body
   const password=user.password
