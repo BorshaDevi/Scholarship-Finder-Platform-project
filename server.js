@@ -63,13 +63,18 @@ app.post('/users',async(req,res) =>{
   const user=req.body
   const password=user.password
   const pass=bcrypt.hashSync(password , 10)
+  const query={email:user.email}
+  const checkUser=await usersCollection.findOne(query)
+  if(user.email === checkUser.email){
+    return res.send('Already Sign Up')
+  }
   const allUsersData={
     name:user.name,
     email:user.email,
     password:pass,
     role:user.role
-
   }
+  
   const result=await usersCollection.insertOne(allUsersData)
   res.send(result)
 })
