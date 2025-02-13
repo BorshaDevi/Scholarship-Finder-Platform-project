@@ -2,6 +2,7 @@ const express=require('express')
 const app=express()
 require('dotenv').config()
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken');
 const cors=require('cors')
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port=process.env.PORT || 5000
@@ -30,13 +31,22 @@ async function run() {
 const usersCollection=client.db('ScholarshipFinder').collection('users')
 const loginCollection=client.db('ScholarshipFinder').collection('loginUsers')
 
+app.post('/jwt',async(req,res)=>{
+  const email=req.body
+const token=jwt.sign(
+  email,process.env.Token_Secret,{ expiresIn: '24h' }
+)
+res.send({token})
+})
+
 app.post ('/loginUser',async(req ,res) =>{
   const user=req.body
   const email=user.email
   const password=user.password
   const query={email : email}
   const findUser=await usersCollection.findOne(query)
-  const findUserPassword=bcrypt.compareSync(password , findUser.password)
+  console.log(findUser.password)
+  const findUserPassword=bcrypt.compareSync(password,findUser.password)
   if(!findUserPassword){
     return res.send('Unauthorize')
   }
