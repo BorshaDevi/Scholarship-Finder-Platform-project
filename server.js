@@ -6,7 +6,7 @@ const cors=require('cors')
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port=process.env.PORT || 5000
 
-app.use(express())
+app.use(express.json())
 app.use(cors())
 
 
@@ -27,10 +27,23 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+const usersCollection=client.db('ScholarshipFinder').collection('users')
 
 
+app.post('/users',async(req,res) =>{
+  const user=req.body
+  const password=user.password
+  const pass=bcrypt.hashSync(password , 10)
+  console.log(pass)
+  const allUsersData={
+    name:user.name,
+    email:user.email,
+    password:pass
 
-
+  }
+  const result=await usersCollection.insertOne(allUsersData)
+  res.send(result)
+})
 
 
 
