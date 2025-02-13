@@ -34,11 +34,11 @@ app.post('/users',async(req,res) =>{
   const user=req.body
   const password=user.password
   const pass=bcrypt.hashSync(password , 10)
-  console.log(pass)
   const allUsersData={
     name:user.name,
     email:user.email,
-    password:pass
+    password:pass,
+    role:user.role
 
   }
   const result=await usersCollection.insertOne(allUsersData)
